@@ -1,0 +1,27 @@
+{
+  "generated_at_utc": "2026-11-04T05:49:46.253268+00:00",
+  "mode": "quick",
+  "sample_rows": 500,
+  "files_seen": 79,
+  "xlsx_files": 49,
+  "documents": 30,
+  "sheets_inspected": 49,
+  "columns_detected": 885,
+  "sheets_with_errors": 0,
+  "families": {
+    "BASES_ESTANDAR": 30,
+    "ADJUDICACIONES": 3,
+    "CONSORCIO": 3,
+    "CONTRATOS": 3,
+    "CONVOCATORIAS": 3,
+    "ORDENESCOMPRA": 34,
+    "PROVEEDORES": 3
+  },
+  "limitations": [
+    "Modo quick: nulos y tipos se estiman sobre las primeras filas; no son cifras globales.",
+    "Fecha numérica inferida por encabezado, no se inspeccionaron estilos de fecha.",
+    "No se han validado llaves de unión ni duplicados entre fuentes.",
+    "Mapeos canónicos orientativos sujetos a diccionarios oficiales.",
+    "No se exportan ejemplos de celdas para prevenir exposición de datos personales."
+  ]
+}

@@ -1,0 +1,4 @@
+﻿file,family,year,sheet,header_row,mode,rows_analyzed,row_count_kind,worksheet_dimension_declared,columns_detected,status
+CONOSCE_CONVOCATORIAS2024_0.xlsx,CONVOCATORIAS,2024,Sheet1,1,full,67292,exacto_en_filas_con_contenido,A1:AB67293,28,ok
+CONOSCE_CONVOCATORIAS2025_0.xlsx,CONVOCATORIAS,2025,Sheet1,1,full,63944,exacto_en_filas_con_contenido,A1:AB63945,28,ok
+CONOSCE_CONVOCATORIAS2026_0.xlsx,CONVOCATORIAS,2026,Sheet1,1,full,46709,exacto_en_filas_con_contenido,A1:AB46710,28,ok

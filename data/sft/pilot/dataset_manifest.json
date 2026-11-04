@@ -1,0 +1,31 @@
+{
+  "schema_version": "perucompras-sft-v1",
+  "seed": 42,
+  "max_examples": 200,
+  "eligible_candidates": 322740,
+  "selected_examples": 200,
+  "split_counts": {
+    "train": 159,
+    "val": 23,
+    "test": 18
+  },
+  "task_counts": {
+    "extraction": 107,
+    "classification": 93
+  },
+  "unique_procedures_selected": 200,
+  "split_strategy": "stable sha256 of procedure_id; group level, not row level",
+  "label_policy": "Category copied from official OBJETOCONTRACTUAL; extraction copies provided fields; NO inferred IT labels, regulatory decisions, or legal conclusions.",
+  "qa_required": true,
+  "notes": [
+    "El test no debe usarse para seleccionar ejemplos ni afinar prompts.",
+    "Las mismas fuentes pueden revelar la respuesta en el input de extraccion: evaluar extraccion vs transformacion por separado.",
+    "Muestra piloto; distribucion por clase no estratificada.",
+    "Un procedimiento puede producir mas de un ejemplo; comparte siempre split."
+  ],
+  "source_files": [
+    "data\\processed\\procedures.parquet",
+    "data\\processed\\procedure_items.parquet"
+  ],
+  "excluded_years": []
+}

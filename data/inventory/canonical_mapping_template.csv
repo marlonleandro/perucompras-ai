@@ -1,0 +1,15 @@
+﻿canonical_field,description,candidate_headers,mapped_header,mapping_status,transformation_rule,nullable
+procedure_id,Campo objetivo; no inferir del nombre del archivo,ID PROCEDIMIENTO | ID_PROCEDIMIENTO | CODIGO PROCEDIMIENTO | CODIGO DE PROCEDIMIENTO | NOMENCLATURA | NRO PROCEDIMIENTO | ID CONVOCATORIA,,PENDIENTE_REVISAR_XLSX,,SI
+source_record_id,Campo objetivo; no inferir del nombre del archivo,ID | ID REGISTRO | ID_REGISTRO | CODIGO | CODIGO UNICO,,PENDIENTE_REVISAR_XLSX,,SI
+entity_name,Campo objetivo; no inferir del nombre del archivo,ENTIDAD | NOMBRE ENTIDAD | NOMBRE DE LA ENTIDAD | ENTIDAD CONVOCANTE | RAZON SOCIAL ENTIDAD,,PENDIENTE_REVISAR_XLSX,,SI
+title,Campo objetivo; no inferir del nombre del archivo,OBJETO DE CONTRATACION | OBJETO DE LA CONTRATACION | DESCRIPCION DEL OBJETO | OBJETO | DENOMINACION,,PENDIENTE_REVISAR_XLSX,,SI
+description,Campo objetivo; no inferir del nombre del archivo,DESCRIPCION | DETALLE | DESCRIPCION DEL PROCEDIMIENTO,,PENDIENTE_REVISAR_XLSX,,SI
+procurement_type,Campo objetivo; no inferir del nombre del archivo,TIPO DE PROCEDIMIENTO | TIPO PROCEDIMIENTO | TIPO DE CONTRATACION,,PENDIENTE_REVISAR_XLSX,,SI
+category,Campo objetivo; no inferir del nombre del archivo,TIPO DE OBJETO | OBJETO CONTRACTUAL | CATEGORIA | TIPO DE OBJETO CONTRACTUAL,,PENDIENTE_REVISAR_XLSX,,SI
+publication_date,Campo objetivo; no inferir del nombre del archivo,FECHA DE CONVOCATORIA | FECHA CONVOCATORIA | FECHA PUBLICACION | FECHA DE PUBLICACION,,PENDIENTE_REVISAR_XLSX,,SI
+estimated_value,Campo objetivo; no inferir del nombre del archivo,VALOR ESTIMADO | VALOR REFERENCIAL | MONTO REFERENCIAL | MONTO ESTIMADO,,PENDIENTE_REVISAR_XLSX,,SI
+currency,Campo objetivo; no inferir del nombre del archivo,MONEDA | TIPO MONEDA,,PENDIENTE_REVISAR_XLSX,,SI
+status,Campo objetivo; no inferir del nombre del archivo,ESTADO DEL PROCEDIMIENTO | ESTADO PROCEDIMIENTO | ESTADO,,PENDIENTE_REVISAR_XLSX,,SI
+legal_regime,Campo objetivo; no inferir del nombre del archivo,REGIMEN LEGAL | NORMATIVA APLICABLE | LEY APLICABLE,,PENDIENTE_REVISAR_XLSX,,SI
+source_url,Campo objetivo; no inferir del nombre del archivo,URL | ENLACE | LINK | URL PROCEDIMIENTO,,PENDIENTE_REVISAR_XLSX,,SI
+retrieved_at,Campo objetivo; no inferir del nombre del archivo,,,PENDIENTE_REVISAR_XLSX,,SI

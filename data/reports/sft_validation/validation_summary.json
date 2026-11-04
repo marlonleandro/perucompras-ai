@@ -1,0 +1,59 @@
+{
+  "status": "PASS",
+  "counts": {
+    "train_rows": 159,
+    "train_extraction": 87,
+    "train_classification": 72,
+    "val_rows": 23,
+    "val_classification": 10,
+    "val_extraction": 13,
+    "test_rows": 18,
+    "test_classification": 11,
+    "test_extraction": 7
+  },
+  "class_distribution": {
+    "train": {
+      "Bien": 42,
+      "Obra": 8,
+      "Servicio": 19,
+      "Consultoría de Obra": 3
+    },
+    "val": {
+      "Servicio": 4,
+      "Bien": 4,
+      "Consultoría de Obra": 1,
+      "Obra": 1
+    },
+    "test": {
+      "Consultoría de Obra": 4,
+      "Obra": 1,
+      "Servicio": 4,
+      "Bien": 2
+    }
+  },
+  "issues_by_code": {},
+  "errors": 0,
+  "warnings": 0,
+  "metadata": {
+    "rows": 200,
+    "columns": [
+      "example_id",
+      "split",
+      "procedure_id",
+      "task",
+      "source_year",
+      "source_file",
+      "source_sheet",
+      "source_excel_row",
+      "source_record_id",
+      "label_origin",
+      "annotation_status"
+    ],
+    "unique_procedures": 200
+  },
+  "limitations": [
+    "La extracción es una tarea de copia de campos, no extracción documental.",
+    "Solo se verifica fuga por procedure_id si se suministran metadatos con split y procedure_id.",
+    "La revisión humana del contenido no se sustituye por estas validaciones."
+  ]
+}

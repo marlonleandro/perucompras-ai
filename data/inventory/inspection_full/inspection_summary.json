@@ -1,0 +1,21 @@
+{
+  "generated_at_utc": "2026-11-04T05:55:12.030742+00:00",
+  "mode": "full",
+  "sample_rows": null,
+  "files_seen": 3,
+  "xlsx_files": 3,
+  "documents": 0,
+  "sheets_inspected": 3,
+  "columns_detected": 84,
+  "sheets_with_errors": 0,
+  "families": {
+    "CONVOCATORIAS": 3
+  },
+  "limitations": [
+    "Modo quick: nulos y tipos se estiman sobre las primeras filas; no son cifras globales.",
+    "Fecha numérica inferida por encabezado, no se inspeccionaron estilos de fecha.",
+    "No se han validado llaves de unión ni duplicados entre fuentes.",
+    "Mapeos canónicos orientativos sujetos a diccionarios oficiales.",
+    "No se exportan ejemplos de celdas para prevenir exposición de datos personales."
+  ]
+}

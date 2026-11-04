@@ -1,0 +1,40 @@
+{
+  "n": 23,
+  "tasks": {
+    "classification": {
+      "count": 10,
+      "json_valid_rate": 1.0,
+      "mean_latency_seconds": 1.55,
+      "accuracy": 0.0,
+      "macro_f1": 0.0,
+      "labels_in_gold": [
+        "Bien",
+        "Consultoría de Obra",
+        "Obra",
+        "Servicio"
+      ]
+    },
+    "extraction": {
+      "count": 13,
+      "json_valid_rate": 0.9231,
+      "mean_latency_seconds": 21.602,
+      "field_exact_match": 0.0,
+      "record_exact_match": 0.0,
+      "notice": "Mide copia o transformación de atributos suministrados, no extracción desde PDF."
+    }
+  },
+  "run": {
+    "model": "Qwen/Qwen3-8B",
+    "input": "data\\sft\\pilot\\val.jsonl",
+    "quantization": "4bit",
+    "max_new_tokens": 384,
+    "max_input_tokens": 2048,
+    "n": 23,
+    "date_utc": "2026-11-04T17:14:04.173302+00:00",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.22.1",
+    "enable_thinking": false,
+    "do_sample": false,
+    "prompt_version": "baseline_v1"
+  }
+}

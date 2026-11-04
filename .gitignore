@@ -1,0 +1,93 @@
+# ==============================================================================
+# .gitignore — PeruCompras AI
+#
+# Criterio: se versiona el codigo, la configuracion y los resultados pequenos
+# (inventario, perfiles, reportes, dataset piloto). NO se versionan las fuentes
+# Excel/Word (~1.4 GB), los datos derivados de gran tamano ni el entorno virtual.
+#
+# Para forzar la inclusion de un archivo ignorado:  git add -f ruta/archivo
+# ==============================================================================
+
+# ---------- Fuentes crudas: Excel y Word ----------
+# Carpeta de fuentes originales (CONOSCE + bases estandar, ~1.4 GB)
+data/raw/
+
+# Hojas de calculo
+*.xlsx
+*.xlsm
+*.xlsb
+*.xls
+*.xltx
+*.xltm
+
+# Documentos Word
+*.docx
+*.doc
+*.dotx
+
+# Archivos temporales / de bloqueo de Office  (~$libro.xlsx)
+~$*
+
+# ---------- Datos derivados de gran tamano (regenerables) ----------
+# normalize_conosce.py -> python scripts/normalize_conosce.py
+data/processed/
+data/interim/
+data/benchmark/
+*.parquet
+
+# ---------- Entornos virtuales y empaquetado Python ----------
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# ---------- Caches de herramientas y tests ----------
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.ipynb_checkpoints/
+
+# ---------- Entrenamiento y checkpoints de modelos ----------
+# Destino declarado en soup.yaml
+artifacts/
+outputs/
+runs/
+wandb/
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.gguf
+*.onnx
+
+# ---------- Sistema operativo ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Editores / IDE ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ---------- Secretos y logs ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.log
+logs/

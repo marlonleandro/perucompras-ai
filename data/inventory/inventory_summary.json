@@ -1,0 +1,14 @@
+{
+  "files": 79,
+  "total_bytes": 1504898691,
+  "families": {
+    "BASES_ESTANDAR": 30,
+    "ADJUDICACIONES": 3,
+    "CONSORCIO": 3,
+    "CONTRATOS": 3,
+    "CONVOCATORIAS": 3,
+    "ORDENESCOMPRA": 34,
+    "PROVEEDORES": 3
+  },
+  "mode": "raw"
+}

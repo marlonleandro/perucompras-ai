@@ -1,0 +1,171 @@
+{
+  "input_files": [
+    "data\\processed\\procedures.parquet",
+    "data\\processed\\procedure_items.parquet"
+  ],
+  "counts": {
+    "procedures": 161370,
+    "procedure_items": 177945
+  },
+  "integrity": {
+    "duplicate_procedure_id": 0,
+    "missing_procedure_id": 0,
+    "items_without_procedure": 0,
+    "duplicate_source_record_ids": 0,
+    "missing_source_record_id": 0,
+    "item_count_mismatches": 0,
+    "procedures_with_multiple_item_currencies": 4
+  },
+  "quality_warnings": {},
+  "null_counts": {
+    "procedures": {},
+    "procedure_items": {
+      "item_code": 30091
+    }
+  },
+  "categories_top": [
+    [
+      "Bien",
+      71977
+    ],
+    [
+      "Servicio",
+      56745
+    ],
+    [
+      "Obra",
+      18719
+    ],
+    [
+      "Consultoría de Obra",
+      13929
+    ]
+  ],
+  "procurement_types_top": [
+    [
+      "Adjudicación Simplificada",
+      45046
+    ],
+    [
+      "Licitación Pública Abreviada",
+      22686
+    ],
+    [
+      "Concurso Público Abreviado",
+      19562
+    ],
+    [
+      "Subasta Inversa Electrónica",
+      19375
+    ],
+    [
+      "Comparación de Precios",
+      12345
+    ],
+    [
+      "Contratación Directa",
+      11304
+    ],
+    [
+      "Licitación Pública",
+      8283
+    ],
+    [
+      "Regímen Especial",
+      5603
+    ],
+    [
+      "Convenio",
+      3969
+    ],
+    [
+      "Concurso Público",
+      3864
+    ],
+    [
+      "Concurso Público de Servicios",
+      2966
+    ],
+    [
+      "Contratación Internacional",
+      2774
+    ],
+    [
+      "Adjudicación Abreviada",
+      1038
+    ],
+    [
+      "Concurso Público para Consultoría",
+      803
+    ],
+    [
+      "Adjudicación Selectiva",
+      659
+    ],
+    [
+      "Adjudicación Simplificada-Homologación",
+      445
+    ],
+    [
+      "Procedimiento Especial de Contratación",
+      181
+    ],
+    [
+      "Licitación Pública Abreviada Homologación",
+      138
+    ],
+    [
+      "Adjudicación Simplificada-Decreto Legislativo N° 1577",
+      60
+    ],
+    [
+      "Concurso Público Abreviado Homologación",
+      52
+    ],
+    [
+      "Procedimiento Especial de Contratación-Nueva Convocatoria por Desierto",
+      51
+    ],
+    [
+      "Adjudicación Simplificada - Decreto Urgencia 032-2023",
+      43
+    ],
+    [
+      "Concurso Público Abreviado Séptima DCF Ley N°32069",
+      27
+    ],
+    [
+      "Selección de Consultores Individuales",
+      19
+    ],
+    [
+      "Adjudicación Simplificada - Ley N° 31728",
+      15
+    ]
+  ],
+  "procedures_by_year": {
+    "2024": 60613,
+    "2025": 58177,
+    "2026": 42580
+  },
+  "items_by_year": {
+    "2024": 67292,
+    "2025": 63944,
+    "2026": 46709
+  },
+  "item_currencies": {
+    "PEN": 173921,
+    "USD": 3527,
+    "EUR": 412,
+    "GBP": 80,
+    "CAD": 2,
+    "BRL": 1,
+    "CHF": 2
+  },
+  "tech_candidate_examples_exported": 300,
+  "notes": [
+    "Coincidencias TI: heuristica de palabras clave, NO etiquetas verificadas.",
+    "Los importes provienen del ETL; no son convertidos a una moneda comun.",
+    "La discrepancia de monedas a nivel de items no significa necesariamente que la fuente sea incorrecta."
+  ]
+}
