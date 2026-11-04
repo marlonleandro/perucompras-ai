@@ -1,0 +1,63 @@
+{
+  "n": 3,
+  "tasks": {
+    "classification": {
+      "count": 2,
+      "strict_json_valid_rate": 1.0,
+      "schema_compliance_rate": 1.0,
+      "truncation_rate": 0.0,
+      "mean_latency_seconds": 1.605,
+      "p95_latency_seconds": 1.969,
+      "accuracy": 0.5,
+      "macro_f1_all_four_labels": 0.25,
+      "labels": [
+        "Bien",
+        "Servicio",
+        "Obra",
+        "Consultoría de Obra"
+      ],
+      "confusion": {
+        "Bien": {
+          "Obra": 1
+        },
+        "Servicio": {
+          "Servicio": 1
+        },
+        "Obra": {},
+        "Consultoría de Obra": {}
+      }
+    },
+    "extraction": {
+      "count": 1,
+      "strict_json_valid_rate": 1.0,
+      "schema_compliance_rate": 1.0,
+      "truncation_rate": 0.0,
+      "mean_latency_seconds": 26.913,
+      "p95_latency_seconds": 26.913,
+      "field_exact_match": 1.0,
+      "record_exact_match": 1.0,
+      "correct_fields": 10,
+      "total_fields": 10,
+      "note": "Transformacion estructurada de campos proporcionados; no mide extraccion desde documentos externos."
+    }
+  },
+  "run": {
+    "model": "Qwen/Qwen3-8B",
+    "input": "data\\sft\\pilot\\val.jsonl",
+    "input_sha256": "df2be79f4ad4139172d3efc971d2e1fdc3fd63449fcaa5988c3fadf64f6099be",
+    "quantization": "4bit",
+    "max_new_tokens": 768,
+    "max_input_tokens": 2048,
+    "n": 3,
+    "date_utc": "2026-11-04T20:09:08.785382+00:00",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.22.1",
+    "enable_thinking": false,
+    "do_sample": false,
+    "prompt_version": "baseline_v2_schema_contract_1",
+    "json_schema_version": "perucompras-extraction-10-fields-v1",
+    "notice": "No comparable directamente con baseline_v1: el prompt fue modificado y el presupuesto de tokens aumento a 768.",
+    "adapter": "artifacts\\perucompras-qwen3-8b-e01",
+    "experiment": "E01_QLORA"
+  }
+}

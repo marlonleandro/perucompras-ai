@@ -1,18 +1,18 @@
 # PerúCompras AI — Laboratorio de Fine-Tuning con Qwen3-8B
 
-> **Estado:** ingesta, normalización, auditoría y dataset SFT piloto completados; benchmark del modelo base ejecutado localmente sobre validación. **Fine-tuning aún pendiente.**  
+> **Estado:** pipeline de datos, benchmarks B1/B2 y entrenamiento/evaluación E01 completados. **E02 (dataset especializado) pendiente.**  
 > **Última actualización del README:** 2026-11-04.
 
 ## 1. Descripción
 
-**PerúCompras AI** es un proyecto de investigación aplicada orientado a construir y evaluar un modelo de lenguaje especializado en contrataciones públicas peruanas. Utiliza datos oficiales **OECE/CONOSCE**, **Qwen3-8B** como modelo open-weight y **Soup CLI** como herramienta prevista para fine-tuning supervisado (SFT) con LoRA/QLoRA.
+**PerúCompras AI** es un proyecto de investigación aplicada orientado a construir y evaluar un modelo de lenguaje especializado en contrataciones públicas peruanas. Utiliza datos oficiales **OECE/CONOSCE**, **Qwen3-8B** como modelo open-weight y **Soup CLI** para fine-tuning supervisado (SFT) con LoRA/QLoRA. El entrenamiento exploratorio **E01 se completó**, se verificó la carga del adaptador y se comparó contra el modelo original.
 
 El laboratorio persigue dos objetivos complementarios:
 
 1. **Investigación reproducible:** comprobar si el ajuste supervisado mejora las tareas de clasificación del objeto contractual y transformación/extracción estructurada respecto de Qwen3-8B sin ajuste.
 2. **Producto aplicable:** sentar las bases de un asistente para proveedores que permita analizar convocatorias, identificar requisitos y evaluar preliminarmente su compatibilidad con el perfil de una empresa, apoyándose en documentos vigentes y evidencia verificable.
 
-**Alcance actual:** clasificación en categorías oficiales y transformación de atributos estructurados de convocatorias a JSON. **No** se ha entrenado todavía un clasificador validado de especialidades TI, ni se han implementado análisis jurídico, evaluación automática de elegibilidad o extracción desde bases/TDR completos.
+**Alcance implementado:** clasificación en cuatro categorías oficiales y transformación de atributos estructurados de convocatorias a JSON. Se entrenó y evaluó un **adaptador LoRA exploratorio (E01)**, sin mejora observable en el conjunto piloto de Validation. **No** se ha implementado todavía un clasificador validado de especialidades TI, análisis jurídico, elegibilidad automática ni extracción de bases/TDR completos.
 
 ## 2. Tecnologías y entorno
 
@@ -30,22 +30,24 @@ El laboratorio persigue dos objetivos complementarios:
 | Almacenamiento | 954 GB totales; 596.9 GB utilizados según la captura |
 | Python | 3.11 |
 | NVIDIA | Controlador 610.74; `nvidia-smi` reportó CUDA UMD 13.3 |
-| Framework | PyTorch con CUDA habilitado para inferencia; versión exacta por documentar |
+| Framework | PyTorch `2.11.0+cu128`; Transformers `5.22.1` en los benchmarks |
 | Librerías de trabajo | `pyarrow`, `transformers`, `accelerate`, `bitsandbytes`, `safetensors`; otras según script |
 
 > **Importante:** 32 GB es la **RAM del sistema**, mientras que 8 GB es la **VRAM de la GPU**. Son recursos distintos. La versión CUDA indicada por `nvidia-smi` no necesariamente coincide con la versión con la que fue compilado PyTorch.
 
-La carga cuantizada de Qwen3-8B en la RTX 5050 se confirmó mediante el mensaje `Modelo cargado en cuda:0`. El benchmark de 23 ejemplos terminó y generó sus archivos, pero sus métricas numéricas todavía no están incorporadas a este README.
+La carga cuantizada de Qwen3-8B se confirmó sobre CUDA. El entrenamiento E01 se completó en esta laptop y el adaptador cargó correctamente para inferencia mediante **Transformers + bitsandbytes + PEFT**. En una prueba aislada de inferencia se reportaron **5.79 GB de VRAM máxima reservada**; no representa una medición del máximo usado durante entrenamiento.
 
-### Modelo y entrenamiento previsto
+### Modelo, herramientas y versiones observadas
 
-- **Base:** [`Qwen/Qwen3-8B`](https://huggingface.co/Qwen/Qwen3-8B).
-- **Fine-tuning previsto:** [Soup CLI](https://github.com/MakazhanAlpamys/Soup), SFT con LoRA/QLoRA y cuantización de 4 bits.
-- **Inferencia base:** Transformers + bitsandbytes (4 bits), con modo de razonamiento desactivado en el benchmark cuando la versión del tokenizador lo permite.
-- **Publicación futura:** Hugging Face (modelo/adaptador, tarjeta del modelo y dataset redistribuible).
+- **Base:** [`Qwen/Qwen3-8B`](https://huggingface.co/Qwen/Qwen3-8B); revisión reportada en Soup: `b968826d9c46dd6066d109eabc6255188de91218`.
+- **Fine-tuning ejecutado:** [Soup CLI](https://github.com/MakazhanAlpamys/Soup), SFT con adaptador LoRA; configuración de cuantización 4 bits y *layer streaming* para VRAM limitada, conforme a la configuración del experimento.
+- **Entrenamiento E01:** `run_20261104_141942_9ce52090`, 36 pasos, 1 época configurada, ~4 minutos.
+- **Inferencia:** Transformers + bitsandbytes (NF4 de 4 bits) + PEFT para cargar el adaptador; generación determinista sin modo de razonamiento en el benchmark.
+- **Dependencias verificadas en los reportes de benchmark:** PyTorch `2.11.0+cu128`, Transformers `5.22.1`. Versiones exactas de Soup, PEFT, accelerate y bitsandbytes por añadir al manifiesto de entorno.
+- **Publicación futura:** Hugging Face, condicionada a evaluación ampliada y revisión de licencias.
 - **Producto futuro:** FastAPI, Angular, PostgreSQL, Qdrant/RAG y reglas deterministas.
 
-El archivo `soup.yaml` raíz contiene una configuración preliminar; **su entrenamiento exitoso aún no está verificado**. `configs/soup.yaml` y otros archivos enumerados más adelante están vacíos.
+**Advertencia de hardware:** el entrenamiento con *layer streaming* no implica que la carga de Qwen3-8B en precisión completa para inferencia quepa íntegramente en los 8 GB. `soup chat --model artifacts/perucompras-qwen3-8b-e01` falló por falta de `offload_dir` al distribuir capas hacia CPU; la carga de base cuantizada a 4 bits seguida de `PeftModel.from_pretrained` sí funcionó.
 
 ## 3. Fuentes de datos
 
@@ -74,18 +76,20 @@ Los insumos descargados están en `data/raw/` (79 archivos, aproximadamente 1,43
 
 ```text
 perucompras-ai/
-├── .gitignore                         # excluye Excel/Word, datos derivados y .venv
+├── .gitignore                         # completar/verificar antes de publicar
 ├── README.md
 ├── pyproject.toml                     # pendiente
 ├── requirements.txt                   # pendiente
-├── soup.yaml                          # configuración SFT/LoRA/4 bits inicial
+├── soup.yaml                          # configuración preliminar anterior a E01
 ├── api/                               # futuro backend
 ├── artifacts/                         # checkpoints/adaptadores; no versionar
+│   └── perucompras-qwen3-8b-e01/      # adaptador LoRA E01 generado por Soup
 ├── frontend/                          # futura interfaz
 ├── notebooks/                         # notebooks por desarrollar
 ├── configs/
 │   ├── experiment.yaml                # pendiente
-│   └── soup.yaml                      # pendiente; configuración operativa en raíz
+│   ├── soup.yaml                      # archivo anterior/preliminar
+│   └── soup_e01.yaml                  # configuración de entrenamiento E01
 ├── docs/
 │   ├── data_sources.md                # pendiente
 │   ├── dataset_card.md                # pendiente
@@ -106,7 +110,10 @@ perucompras-ai/
 │   ├── audit_conosce.py
 │   ├── build_sft_dataset.py
 │   ├── validate_sft_dataset.py
-│   └── benchmark_qwen3_base.py
+│   ├── benchmark_qwen3_base.py       # baseline v1
+│   ├── benchmark_qwen3_base_v2.py    # baseline con contrato JSON explícito
+│   ├── benchmark_qwen3_lora_v2.py    # benchmark v2 que carga adaptador PEFT
+│   └── test_lora_e01.py              # smoke test del adaptador
 ├── tests/
 │   ├── test_pipeline.py
 │   └── test_tools.py
@@ -131,7 +138,9 @@ perucompras-ai/
         ├── audit/
         ├── sft_validation/
         ├── benchmark_smoke/
-        └── benchmark_base_val/
+        ├── benchmark_base_val/        # baseline v1
+        ├── benchmark_base_val_v2/     # baseline v2
+        └── benchmark_lora_e01_val/    # evaluación E01 con v2
 ```
 
 ## 5. Pipeline implementado y resultados
@@ -201,14 +210,80 @@ Los 30,091 `item_code` vacíos no se completan artificialmente; se mantiene `sou
 - Resultado reportado para el piloto: **200 ejemplos evaluados, 0 errores automáticos**.
 - Esta aprobación no equivale a revisión semántica, normativa o humana de las etiquetas.
 
-### 5.6. Benchmark Qwen3-8B original
+### 5.6. Benchmark B1 — Qwen3-8B original, prompt genérico
 
-- `benchmark_qwen3_base.py` ejecuta inferencia de Qwen3-8B **sin fine-tuning**, cuantizado en 4 bits, y calcula métricas separadas por tarea.
-- Se corrigió el uso de `BatchEncoding` del tokenizador, accediendo a `model_inputs["input_ids"]` y utilizando `model.generate(**model_inputs)`.
-- **Smoke test:** ejecutado con 3 ejemplos y archivos generados en `data/reports/benchmark_smoke/`.
-- **Validación:** ejecutada con los 23 ejemplos de `val.jsonl`; salidas disponibles en `data/reports/benchmark_base_val/`.
-- **Métricas numéricas de accuracy, macro-F1, exact match, JSON válido y latencia:** pendientes de transcribir desde `benchmark_summary.json` (no incluidas en la información compartida hasta ahora).
-- **Test (18 ejemplos):** reservado, sin usar para seleccionar prompts o hiperparámetros.
+- Script: `scripts/benchmark_qwen3_base.py`; 23 ejemplos de Validation; 4 bits; `max_new_tokens=384`; prompt `baseline_v1`.
+- Clasificación: **accuracy 0 %**, macro-F1 **0** (10 ejemplos).
+- Extracción: **field exact match 0 %**, **record exact match 0 %** (13 ejemplos); 92.31 % de respuestas JSON válidas en esta tarea.
+- **Interpretación:** las respuestas usaban claves diferentes de las esperadas, y el evaluador exigía coincidencia exacta. Los ceros indican **incumplimiento del contrato estricto**, no ausencia absoluta de capacidad semántica.
+- Resultado en `data/reports/benchmark_base_val/`.
+
+### 5.7. Benchmark B2 — Qwen3-8B original, contrato explícito
+
+- Script: `scripts/benchmark_qwen3_base_v2.py`; `prompt_version=baseline_v2_schema_contract_1`; contrato de cuatro categorías oficiales y diez campos canónicos; `max_new_tokens=768`; JSON estricto.
+- Validation: **23** ejemplos (10 clasificación, 13 extracción), con `input_sha256=df2be79f4ad4139172d3efc971d2e1fdc3fd63449fcaa5988c3fadf64f6099be`.
+- Modelo original; PyTorch `2.11.0+cu128`, Transformers `5.22.1`; `do_sample=False`, `enable_thinking=False`, cuantización 4 bits.
+- Clasificación: **accuracy 90.00 % (9/10)** y **macro-F1 0.881**.
+- Extracción: **field exact match 98.46 % (128/130)**, **record exact match 84.62 % (11/13)**.
+- JSON válido y conformidad de esquema: **100 %** en ambas tareas; **0 %** truncamiento detectado.
+- Latencia promedio: clasificación **1.046 s**, extracción **26.138 s**; P95: **1.665 s** y **57.458 s**.
+- Errores observados: clasificación de un `Bien` como `Obra` (línea 3); normalización no solicitada de `PROVINCIAA` a `PROVINCIA` (línea 21) y de `AU-TORIZADOS` a `AUTORIZADOS` (línea 23).
+- Resultado en `data/reports/benchmark_base_val_v2/`.
+
+**No comparar B1 y B2 como si fueran pesos diferentes:** el modelo es el mismo, pero cambiaron el contrato de prompt y el presupuesto de tokens. B2 mide la línea base pertinente para comparar el fine-tuning.
+
+### 5.8. Entrenamiento E01 — Soup CLI, LoRA/QLoRA exploratorio
+
+**Ejecución completada el 04/11/2026** en Windows, RTX 5050 Laptop 8 GB, con `Qwen/Qwen3-8B`.
+
+| Parámetro | Valor verificado o configurado |
+|---|---|
+| Run ID | `run_20261104_141942_9ce52090` |
+| Estado | `completed` |
+| Tarea / backend | SFT / Transformers |
+| Ejemplos originales de Train | 159; `val_split: 0.1` (aprox. 143 entrenamiento interno) |
+| `data.max_length` | **1024** (512 descartaba el objetivo en la fila 11) |
+| `data.train_on_responses_only` | `true` |
+| `data.train_on_prompt` | `false` |
+| Épocas / pasos | 1 época configurada / **36 pasos** |
+| Learning rate | `2e-05` |
+| Batch / acumulación | 1 / 4 |
+| LoRA | `r=8`, `alpha=16` configurado |
+| Pérdida reportada por Soup | **0.8130 → 1.1173** |
+| Duración reportada | **4 min** |
+| Salida | `artifacts/perucompras-qwen3-8b-e01` |
+
+**Incidencias y soluciones:**
+
+1. Con `max_length: 512`, Soup abortó por falta de tokens supervisables en la fila 11 después de truncar; el ajuste a **1024** permitió completar la preparación y el entrenamiento.
+2. Transformers mostró una advertencia relativa a `return_assistant_tokens_mask` y `{% generation %}`. La configuración de ejecución reportó entrenamiento sobre respuestas (`train_on_responses_only=true`), pero el log disponible **no demuestra por sí solo** cómo se construyó la máscara en cada ejemplo; conviene inspeccionarla antes de E02.
+3. Soup finalizó correctamente y generó el adaptador. `soup chat` falló durante la carga del adaptador por `offload_dir` no configurado al usar CPU offload. El script `test_lora_e01.py` resolvió la inferencia cargando el modelo base **NF4 4-bit** y luego el adaptador con PEFT.
+4. **Smoke test de inferencia exitoso:** `{"category":"Servicio"}` ante un caso de mantenimiento de servidores; JSON válido. Reserva máxima de VRAM observada **5.79 GB** durante esta prueba.
+
+**Interpretación del Loss:** Soup mostró un incremento de 0.8130 a 1.1173 entre dos valores resumidos. Sin curva completa ni validación de pérdida, esos puntos no bastan para inferir deterioro o mejora de generalización.
+
+### 5.9. Benchmark F1 — Qwen3-8B + adaptador E01
+
+- Script: `scripts/benchmark_qwen3_lora_v2.py`, que carga el modelo original cuantizado a 4 bits y después el adaptador mediante PEFT.
+- Se mantuvieron el mismo dataset Validation, hash, prompt, tamaño máximo de salida y generación determinista de B2.
+- Resultado: **23/23 respuestas textuales idénticas a B2**, incluidos los mismos tres ejemplos con discrepancias.
+
+| Métrica | B2: original | F1: E01 LoRA | Diferencia |
+|---|---:|---:|---:|
+| Accuracy clasificación | 90.00 % | 90.00 % | 0 pp |
+| Macro-F1 | 0.881 | 0.881 | 0 |
+| Extracción: coincidencia por campo | 98.46 % | 98.46 % | 0 pp |
+| Extracción: registros exactos | 84.62 % | 84.62 % | 0 pp |
+| JSON válido / conformidad de esquema | 100 % | 100 % | 0 pp |
+| Truncamientos detectados | 0 % | 0 % | 0 pp |
+| Latencia media clasificación | 1.046 s | 1.181 s | +0.135 s |
+| Latencia media extracción | 26.138 s | 25.692 s | −0.446 s |
+| P95 clasificación | 1.665 s | 1.894 s | +0.229 s |
+| P95 extracción | 57.458 s | 33.944 s | −23.514 s |
+
+Las variaciones de latencia en esta muestra pequeña **no permiten concluir superioridad de rendimiento**. Las salidas idénticas no prueban que los pesos LoRA sean irrelevantes: pueden cambiar las probabilidades internas sin alterar la decodificación determinista.
+
+**Conclusión E01:** ciclo técnico de fine-tuning e inferencia validado en hardware de consumo; **ninguna mejora observable de precisión o de respuestas en Validation (n=23)**. No justifica aún la publicación como modelo especializado superior a Qwen3-8B original.
 
 ## 6. Reproducir el trabajo en Windows (PowerShell)
 
@@ -257,68 +332,127 @@ python .\scripts\build_sft_dataset.py --input data/processed --output data/sft/p
 python .\scripts\validate_sft_dataset.py --input data/sft/pilot --metadata data/sft/pilot/examples_metadata.csv --output data/reports/sft_validation
 ```
 
-### 6.5. Evaluar modelo base
+### 6.5. Evaluar baseline B1 y B2
 
 ```powershell
-# Smoke test: 3 ejemplos de validación
-python .\scripts\benchmark_qwen3_base.py --input data/sft/pilot/val.jsonl --output data/reports/benchmark_smoke --quantization 4bit --limit 3
-
-# Benchmark: los 23 ejemplos de validación
+# B1: prompt genérico (resultado histórico)
 python .\scripts\benchmark_qwen3_base.py --input data/sft/pilot/val.jsonl --output data/reports/benchmark_base_val --quantization 4bit
+
+# B2: prompt y contrato JSON explícitos
+python .\scripts\benchmark_qwen3_base_v2.py --input data/sft/pilot/val.jsonl --output data/reports/benchmark_base_val_v2 --quantization 4bit
 ```
 
-**Importante:** no utilizar `test.jsonl` para iterar sobre prompts o parámetros del modelo. El script exige `--allow-test` al usar ese archivo; reservarlo hasta congelar el protocolo.
+### 6.6. Entrenar E01 con Soup CLI
 
-## 7. Metodología experimental
+Archivo `configs/soup_e01.yaml`, correspondiente al experimento (los valores exactos adicionales deben conservarse desde el archivo local ejecutado):
 
-Los experimentos propuestos son:
+```yaml
+base: Qwen/Qwen3-8B
+task: sft
 
-| ID | Modelo | Contexto | Estado |
+data:
+  train: ./data/sft/pilot/train.jsonl
+  format: alpaca
+  val_split: 0.1
+  max_length: 1024
+  train_on_responses_only: true
+
+training:
+  epochs: 1
+  lr: 0.00002
+  batch_size: 1
+  gradient_accumulation_steps: 4
+  lora:
+    r: 8
+    alpha: 16
+  quantization: 4bit
+  stream_layers: true
+  stream_source: auto
+
+output: ./artifacts/perucompras-qwen3-8b-e01
+```
+
+```powershell
+soup doctor --config configs/soup_e01.yaml
+soup train --config configs/soup_e01.yaml --dry-run
+soup train --config configs/soup_e01.yaml
+soup runs show run_20261104_141942_9ce52090
+```
+
+**Nota:** el YAML anterior resume la configuración conocida, pero el registro de ejecución truncado no permite verificar todas las claves/valores. Para reproducibilidad exacta, conservar el YAML realmente ejecutado, la configuración íntegra de `soup runs show` y un `pip freeze`. No modificar retroactivamente el artefacto original.
+
+### 6.7. Cargar y probar el adaptador
+
+```powershell
+python .\scripts\test_lora_e01.py
+```
+
+Este script carga `Qwen/Qwen3-8B` con `BitsAndBytesConfig(load_in_4bit=True)` y aplica el adaptador guardado mediante `PeftModel.from_pretrained(...)`. Si `soup chat` da un error de `offload_dir`, utilizar la ruta PEFT ya validada en lugar de fusionar el modelo.
+
+### 6.8. Benchmark del modelo afinado E01
+
+```powershell
+python .\scripts\benchmark_qwen3_lora_v2.py `
+  --input data/sft/pilot/val.jsonl `
+  --output data/reports/benchmark_lora_e01_val `
+  --model Qwen/Qwen3-8B `
+  --adapter artifacts/perucompras-qwen3-8b-e01 `
+  --quantization 4bit `
+  --max-new-tokens 768
+```
+
+Para evaluar correctamente, utilizar **el mismo** prompt, dataset, límites de tokens, cuantización y opciones de decodificación del baseline B2. Evitar usar Test para iteraciones de ajuste.
+
+## 7. Metodología experimental y conclusiones
+
+| Experimento | Pesos | Evaluación | Estado |
 |---|---|---|---|
-| B0 | Qwen3-8B original | Prompt estructurado | Ejecutado sobre Validation (23) |
-| B1 | Qwen3-8B original | RAG documental | Pendiente |
-| F0 | Qwen3-8B + LoRA/QLoRA | Fine-tuning SFT | Pendiente |
-| F1 | Qwen3-8B afinado | RAG documental | Pendiente |
+| B1 | Qwen3-8B original | Prompt genérico; 23 Validation | Completado; 0 % según coincidencia estricta |
+| B2 | Qwen3-8B original | Contrato explícito v2; 23 Validation | Completado; **90 % clasificación, 98.46 % por campo** |
+| E01 / F1 | Qwen3-8B + LoRA Soup | Mismo contrato v2; 23 Validation | Completado; **sin mejora observable** |
+| E02 | Qwen3-8B + entrenamiento especializado | Benchmark avanzado por construir | Pendiente |
+| RAG documental | Modelo con recuperación de evidencia | Requisitos normativos y bases/TDR | Pendiente |
 
-**Métricas:** accuracy, macro-F1, validez de JSON, exact match por campo, exact match por registro y latencia. Las métricas se reportan por tarea: clasificación oficial y transformación estructurada.
+**Hallazgo B1→B2:** establecer el contrato de respuesta influyó decisivamente en el resultado medido. B1/B2 no constituyen una comparación de pesos entrenados porque el prompt y el presupuesto de tokens difieren.
 
-**Controles:** mantener prompts y parámetros comparables, registrar versión exacta del modelo y librerías, separar por procedimiento, revisar distribución de etiquetas y reservar Test para evaluación final. El piloto de 18 ejemplos Test es insuficiente para conclusiones robustas; se ampliará el benchmark y se incorporará un conjunto temporal.
+**Hallazgo B2→E01:** el primer fine-tuning fue técnicamente exitoso, pero no cambió ninguna de las 23 salidas. La muestra (10 clasificación, 13 extracción) es pequeña, y la tarea de extracción principalmente copia/renombra información disponible, por lo que no mide comprensión profunda del dominio.
 
-## 8. Próximos pasos
+**Riesgos metodológicos:** etiquetas automáticas pendientes de QA; pocos ejemplos por clase; precisión alta de partida; no hay evaluación independiente de conocimiento normativo; un único entrenamiento no permite estimar variabilidad entre semillas. Las métricas de Test (18 casos) permanecen reservadas. No atribuir al fine-tuning mejoras de contenido sin controlar prompt, particiones, decodificación y revisión de fuentes.
 
-- [x] Descarga e inventario de fuentes.
-- [x] Inspección de esquema CONOSCE 2024–2026.
-- [x] Normalización a procedimientos e ítems.
-- [x] Auditoría estructural y tratamiento de monedas.
-- [x] Generación de 200 ejemplos SFT piloto.
-- [x] Validación automática del dataset.
-- [x] Ejecución de benchmark base sobre 23 ejemplos de Validation.
-- [ ] Analizar `benchmark_summary.json` y revisar errores de `predictions.jsonl`.
-- [ ] Registrar versiones exactas de PyTorch, Transformers, bitsandbytes y Soup.
-- [ ] Revisar y ampliar muestras por categoría, en particular TI.
-- [ ] Construir un benchmark mayor y temporal, con QA humano.
-- [ ] Ejecutar smoke test de fine-tuning con Soup CLI.
-- [ ] Entrenar y evaluar Qwen3-8B con QLoRA.
-- [ ] Comparar B0/B1/F0/F1 en condiciones equivalentes.
-- [ ] Incorporar bases/TDR y recuperación documental RAG.
-- [ ] Desarrollar API y frontend de demostración.
-- [ ] Preparar dataset card, model card, licencias y publicación en Hugging Face.
+## 8. Próximo experimento E02 — Dataset especializado (pendiente)
+
+**Objetivo:** estudiar si el SFT aporta capacidades de interpretación especializada sobre contratación pública peruana que no se resuelvan suficientemente mediante instrucciones, transformación determinista o RAG.
+
+**Propuesta de trabajo, todavía no ejecutada:**
+
+1. Revisar las **30 bases estándar** y documentar procedencia, edición, vigencia, marco normativo y permisos de reutilización. Integrar fuentes normativas oficiales vigentes cuando corresponda.
+2. Diseñar tareas con dificultad real: identificación de requisitos de participación, plazos y criterios, extracción con evidencia, clasificación ambigua y detección de información insuficiente. Separar hechos documentales de inferencias.
+3. Construir `build_sft_dataset_v2.py` con trazabilidad por documento/sección y estado de revisión humana; no utilizar reglas normativas inventadas como etiquetas.
+4. Crear un nuevo benchmark independiente, estratificado por tipo de documento, categoría y dificultad; separar train/validation/test por documento y, cuando sea viable, por período.
+5. Evaluar previamente el **modelo original con prompt fuerte**, y si procede también **RAG sin fine-tuning**, para establecer baselines competitivos.
+6. Afinar únicamente con ejemplos revisados y evaluar contra los mismos baselines. Registrar pérdidas por paso, máscaras de supervisión, hiperparámetros, semillas, tiempo, VRAM y análisis cualitativo de errores.
+
+**Criterios de éxito:** aumento medible de exactitud semántica y fidelidad a evidencias en muestras de evaluación no vistas, sin deterioro relevante en validez JSON, tasa de respuestas sustentadas ni errores graves. Reportar incertidumbre por tamaño de muestra; no concluir generalización con 23 ejemplos.
+
+**Próximos pasos operativos:**
+
+- [x] Ingesta, normalización y auditoría de CONOSCE.
+- [x] Dataset piloto de 200 ejemplos y particiones por procedimiento.
+- [x] Benchmark B1 y contrato v2 B2.
+- [x] Fine-tuning Soup E01 (36 pasos, 4 min) y prueba de inferencia PEFT.
+- [x] Benchmark E01 comparado con B2: 23/23 respuestas idénticas.
+- [ ] Respaldar YAML efectivo, `pip freeze`, hash de adaptador y logs completos E01.
+- [ ] Revisar las máscaras supervisadas y confirmar el funcionamiento de `train_on_responses_only`.
+- [ ] Diseñar esquemas y rúbricas de anotación especializada E02.
+- [ ] Inspeccionar bases estándar y versiones normativas aplicables.
+- [ ] Generar y revisar manualmente dataset y benchmark E02.
+- [ ] Ejecutar baseline fuerte y nuevo SFT especializado.
+- [ ] Añadir RAG, API y demo; completar model card y dataset card.
+- [ ] Revisar licencias antes de publicar pesos/datos en Hugging Face.
 
 ## 9. Reproducibilidad, privacidad y Git
 
-Los datos originales, Parquet, JSONL generados y checkpoints pueden ser voluminosos o requerir revisión de licencias. **No publicar indiscriminadamente `data/raw/`, `data/processed/`, `data/sft/`, `artifacts/`, `.venv/` ni secretos.** El [`.gitignore`](./.gitignore) ya está preparado; mantenerlo antes del primer `git add .`, y versionar scripts, esquemas, configuraciones, tests y pequeños fixtures públicos. Guardar manifiestos, checksums, fecha de adquisición y condiciones de uso de las fuentes.
-
-Estado actual de la política de exclusión:
-
-| Excluido | Motivo |
-| --- | --- |
-| `data/raw/`, `*.xlsx`, `*.xls*`, `*.docx`, `*.doc`, `~$*` | Fuentes originales (~1,4 GB) y bloqueos temporales de Office. |
-| `data/processed/`, `data/interim/`, `data/benchmark/`, `*.parquet` | Datos derivados voluminosos y regenerables. |
-| `artifacts/`, `outputs/`, `runs/`, `wandb/`, `*.safetensors`, `*.ckpt`, `*.pt`, `*.gguf` | Checkpoints y adaptadores de entrenamiento. |
-| `.venv/`, `__pycache__/`, `*.py[cod]` | Entorno virtual y artefactos de Python. |
-| `.env`, `.env.*`, `*.pem`, `*.key`, `*.log` | Secretos y registros. |
-
-Se versionan los resultados pequeños que sirven de evidencia reproducible: `data/inventory/` (inventario y perfiles), `data/reports/` (auditoría, validación y benchmarks) y el dataset piloto `data/sft/pilot/`. Para incluir un archivo ignorado de forma deliberada: `git add -f ruta/archivo`.
+Los datos originales, Parquet, JSONL generados y checkpoints pueden ser voluminosos o requerir revisión de licencias. **No publicar indiscriminadamente `data/raw/`, `data/processed/`, `data/sft/`, `artifacts/`, `.venv/` ni secretos.** Preparar un `.gitignore` antes del primer `git add .`, y versionar scripts, esquemas, configuraciones, tests y pequeños fixtures públicos. Guardar manifiestos, checksums, fecha de adquisición y condiciones de uso de las fuentes.
 
 El modelo especializado no sustituirá evaluaciones legales ni garantizará la elegibilidad de una empresa; sus respuestas sobre requisitos deben incluir evidencia documental verificable y controles deterministas cuando corresponda.
 
@@ -332,4 +466,4 @@ El modelo especializado no sustituirá evaluaciones legales ni garantizará la e
 
 ---
 
-**Estado actual:** listo para examinar cuantitativamente el benchmark de Qwen3-8B original y preparar el primer experimento controlado de fine-tuning con Soup CLI. Aún no se ha publicado un modelo afinado.
+**Estado actual:** E01 entrenado y evaluado; se comprobó la viabilidad técnica de LoRA en una RTX 5050 de 8 GB, **sin mejora observable sobre B2**. E02 está planificado, no ejecutado. No se ha publicado un modelo afinado.
