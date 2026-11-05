@@ -1,0 +1,29 @@
+{
+  "stage": "candidate_generation_only",
+  "version": "2.1",
+  "seed": 42,
+  "input_candidates": 159903,
+  "selected_candidates": 280,
+  "task_counts": {
+    "classification_hard": 160,
+    "document_grounded_qa": 120
+  },
+  "selection_stats": {
+    "template_placeholder": 1487,
+    "missing_or_duplicate_candidate_id": 258,
+    "available_Bien": 69659,
+    "selected_Bien": 40,
+    "available_Servicio": 51575,
+    "selected_Servicio": 40,
+    "available_Obra": 17895,
+    "selected_Obra": 40,
+    "available_Consultoría de Obra": 13749,
+    "selected_Consultoría de Obra": 40,
+    "exact_document_duplicates": 468,
+    "near_document_duplicates": 362,
+    "selected_document": 120,
+    "available_document": 5280
+  },
+  "near_duplicate_jaccard_threshold": 0.85,
+  "warning": "NO ENTRENAR. Las etiquetas y respuestas requieren revisión humana; vigencia normativa no verificada."
+}

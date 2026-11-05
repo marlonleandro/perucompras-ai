@@ -1,0 +1,34 @@
+# PeruCompras AI
+# Experimento E02 - SFT especializado
+
+base: Qwen/Qwen3-8B
+task: sft
+backend: transformers
+
+data:
+  train: ./data/sft/e02_v2_1/approved/train.jsonl
+  format: alpaca
+  max_length: 1024
+  train_on_responses_only: true
+
+  # Conservamos los 30 ejemplos externos de Validation
+  # para el benchmark E02. Soup reservara un split interno.
+  val_split: 0.1
+
+training:
+  epochs: 1
+  lr: 0.00002
+  batch_size: 1
+  gradient_accumulation_steps: 4
+  seed: 42
+
+  lora:
+    r: 8
+    alpha: 16
+
+  quantization: 4bit
+
+  stream_layers: true
+  stream_source: auto
+
+output: ./artifacts/perucompras-qwen3-8b-e02

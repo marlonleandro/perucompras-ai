@@ -1,0 +1,23 @@
+{
+  "version": "2.1",
+  "stage": "human_approved_only",
+  "input_candidates": 280,
+  "approved_exported": 280,
+  "excluded": 0,
+  "split_counts": {
+    "train": 233,
+    "val": 30,
+    "test": 17
+  },
+  "approved_task_counts": {
+    "classification_hard": 160,
+    "document_grounded_qa": 120
+  },
+  "seed": 42,
+  "train_pct": 80,
+  "val_pct": 10,
+  "warnings": [
+    "Revisión humana no demuestra vigencia normativa.",
+    "Antes de entrenar, auditar similitud entre ejemplos y cobertura de clases por split."
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "stage": "candidate_generation_only",
+  "warning": "NO ENTRENAR directamente con review_candidates.jsonl. Falta revisión humana.",
+  "total": 280,
+  "task_counts": {
+    "classification_hard": 160,
+    "document_grounded_qa": 120
+  },
+  "seed": 42,
+  "review_file": "data/sft/e02/review_candidates.jsonl"
+}

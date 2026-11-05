@@ -1,0 +1,20 @@
+{
+  "stage": "human_approved_only",
+  "total_candidates": 280,
+  "approved": 0,
+  "excluded": 280,
+  "split_counts": {
+    "train": 0,
+    "val": 0,
+    "test": 0
+  },
+  "approved_tasks": {},
+  "source_groups": 0,
+  "seed": 42,
+  "percentages": {
+    "train": 80,
+    "val": 10,
+    "test": 10
+  },
+  "note": "División por procedimiento o documento. La coincidencia literal de evidencia no garantiza suficiencia jurídica."
+}
